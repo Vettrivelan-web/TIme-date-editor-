@@ -3,419 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Photo Date/Time Editor</title>
-
-    <!-- piexifjs Library (CDN) -->
+    <title>Photo Date Editor (Short)</title>
     <script src="https://cdn.jsdelivr.net/npm/piexifjs@1.0.6/piexif.min.js"></script>
-
-    <!-- Embedded CSS for Modern UI -->
     <style>
-        :root {
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --secondary-color: #28a745;
-            --secondary-hover: #218838;
-            --light-bg: #f8f9fa;
-            --dark-text: #343a40;
-            --light-text: #ffffff;
-            --border-color: #dee2e6;
-            --shadow-color: rgba(0, 0, 0, 0.15);
-            --shadow-color-hover: rgba(0, 0, 0, 0.25);
-            --container-bg: #ffffff;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            /* Subtle Gradient Background */
-            background: linear-gradient(135deg, #e0f7fa 0%, #f8f9fa 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; /* Center content vertically */
-            min-height: 100vh; /* Ensure body takes full viewport height */
-            padding: 20px;
-            margin: 0;
-            color: var(--dark-text);
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: var(--dark-text);
-            text-align: center;
-            margin-bottom: 2rem; /* More space below title */
-            font-weight: 600;
-        }
-
-        .container {
-            background-color: var(--container-bg);
-            padding: 35px 40px; /* More padding */
-            border-radius: 12px; /* More rounded corners */
-            /* Enhanced 3D Shadow */
-            box-shadow: 0 8px 16px var(--shadow-color), 0 4px 6px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px; /* Increased spacing */
-            max-width: 550px; /* Slightly adjusted width */
-            width: 95%;
-            transition: box-shadow 0.3s ease; /* Smooth shadow transition */
-        }
-        .container:hover {
-             box-shadow: 0 12px 24px var(--shadow-color-hover), 0 6px 8px rgba(0,0,0,0.15);
-        }
-
-        .upload-section, .controls-section, .status-section {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        #photoInput { display: none; }
-
-        .upload-button {
-            background-color: var(--primary-color);
-            color: var(--light-text);
-            padding: 12px 25px; /* Slightly larger padding */
-            border: none;
-            border-radius: 8px; /* More rounded */
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500; /* Medium weight */
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            display: inline-block;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); /* Color-matched shadow */
-        }
-        .upload-button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px); /* Lift effect */
-            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
-        }
-         .upload-button:active {
-             transform: translateY(1px); /* Press down effect */
-             box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
-         }
-
-        #fileName {
-            font-size: 0.9em;
-            color: #555;
-            word-wrap: break-word;
-            margin-top: 0;
-        }
-
-        #imagePreview {
-            max-width: 100%;
-            max-height: 300px;
-            margin-top: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px; /* Rounded corners */
-            display: none;
-            background-color: #eee; /* Placeholder bg */
-        }
-
-        #newDateTime {
-            padding: 10px 12px; /* Better padding */
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            margin-top: 8px;
-            font-size: 1em;
-            width: 90%;
-            max-width: 280px;
-            box-sizing: border-box; /* Include padding in width */
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        #newDateTime:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Focus ring */
-            outline: none;
-        }
-
-        label[for="newDateTime"] { /* Style the label too */
-             font-weight: 500;
-             color: #495057;
-        }
-
-        #saveButton {
-            background-color: var(--secondary-color);
-            color: var(--light-text);
-            padding: 14px 30px; /* Larger button */
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600; /* Bolder */
-            margin-top: 25px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, opacity 0.3s ease;
-            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); /* Green shadow */
-        }
-        #saveButton:not(:disabled):hover {
-            background-color: var(--secondary-hover);
-            transform: translateY(-2px); /* Lift effect */
-            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
-        }
-         #saveButton:not(:disabled):active {
-             transform: translateY(1px); /* Press down effect */
-             box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
-         }
-        #saveButton:disabled {
-            background-color: #adb5bd; /* Greyer disabled state */
-            cursor: not-allowed;
-            opacity: 0.65;
-            box-shadow: none; /* No shadow when disabled */
-        }
-
-        #status {
-            margin-top: 20px;
-            font-weight: 500; /* Slightly bolder status */
-            min-height: 1.2em;
-            font-size: 0.95em;
-        }
-        #status.success { color: var(--secondary-color); }
-        #status.error { color: #dc3545; } /* Red for errors */
-        #status.processing { color: var(--primary-color); } /* Blue for processing */
-        #status.warning { color: #ffc107; } /* Yellow for warnings */
-
-
-        #downloadLink {
-            display: none;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #17a2b8; /* Teal color */
-            color: var(--light-text);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            text-align: center;
-            word-wrap: break-word;
-            font-weight: 500;
-            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
-        }
-        #downloadLink:hover {
-            background-color: #138496; /* Darker teal */
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(23, 162, 184, 0.4);
-        }
-         #downloadLink:active {
-             transform: translateY(1px);
-             box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
-         }
+        :root { --primary: #007bff; --secondary: #28a745; --light: #f8f9fa; --dark: #343a40; --white: #fff; --border: #ccc; }
+        body { font-family: sans-serif; background: var(--light); display: flex; flex-direction: column; align-items: center; padding: 15px; margin: 0; color: var(--dark); }
+        .container { background: var(--white); padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 500px; width: 95%; }
+        h1 { margin-bottom: 1rem; font-size: 1.5em; }
+        label, button { display: block; text-align: center; }
+        button, .btn-like { background-color: var(--primary); color: var(--white); padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease; text-decoration: none; }
+        button:hover, .btn-like:hover { background-color: #0056b3; }
+        #pInput { display: none; }
+        #imgPreview { max-width: 100%; max-height: 250px; margin-top: 15px; border: 1px solid var(--border); border-radius: 4px; display: none; }
+        #dtInput { padding: 8px; border: 1px solid var(--border); border-radius: 4px; margin-top: 5px; width: calc(100% - 18px); max-width: 250px; }
+        #sBtn { background-color: var(--secondary); margin-top: 15px; padding: 12px 25px; font-size: 1.05em; }
+        #sBtn:hover { background-color: #218838; }
+        #sBtn:disabled { background-color: #aaa; cursor: not-allowed; }
+        #statusEl { margin-top: 15px; font-weight: bold; min-height: 1.2em; font-size: 0.9em; }
+        #dlLink { background-color: #17a2b8; margin-top: 10px; display: none; }
+        #dlLink:hover { background-color: #138496; }
+        .error { color: red; } .success { color: green; } .processing { color: blue; } .warning { color: orange;}
     </style>
-
 </head>
 <body>
-
-    <h1>Modern Photo Date/Time Editor</h1>
-
+    <h1>Photo Date Editor</h1>
     <div class="container">
-        <div class="upload-section">
-            <label for="photoInput" class="upload-button">Photo Upload செய்ய</label>
-            <input type="file" id="photoInput" accept="image/jpeg, image/png, image/webp">
-            <p id="fileName">எந்த photo-வும் தேர்வு செய்யப்படவில்லை.</p>
-            <img id="imagePreview" src="#" alt="Photo Preview" />
-        </div>
+        <label for="pInput" class="btn-like">Upload Photo</label>
+        <input type="file" id="pInput" accept="image/jpeg, image/png, image/webp">
+        <p id="fName" style="font-size: 0.85em; margin-top: 5px;">No file selected.</p>
+        <img id="imgPreview" src="#" alt="Preview" />
 
-        <div class="controls-section">
-            <label for="newDateTime">புதிய Date மற்றும் Time தேர்வு செய்ய:</label>
-            <input type="datetime-local" id="newDateTime">
-            <button id="saveButton" disabled>Save & Download</button>
-        </div>
+        <label for="dtInput" style="margin-top:10px;">Select New Date & Time:</label>
+        <input type="datetime-local" id="dtInput">
+        <button id="sBtn" disabled>Save & Download</button>
 
-        <div class="status-section">
-            <p id="status"></p>
-            <a id="downloadLink" style="display: none;"></a>
-        </div>
+        <p id="statusEl"></p>
+        <a id="dlLink" class="btn-like"></a>
     </div>
 
-    <!-- Embedded JavaScript (No changes needed here from previous version) -->
     <script>
-        const photoInput = document.getElementById('photoInput');
-        const fileNameDisplay = document.getElementById('fileName');
-        const imagePreview = document.getElementById('imagePreview');
-        const dateTimeInput = document.getElementById('newDateTime');
-        const saveButton = document.getElementById('saveButton');
-        const statusDisplay = document.getElementById('status');
-        const downloadLink = document.getElementById('downloadLink');
+        const pInput = document.getElementById('pInput');
+        const fName = document.getElementById('fName');
+        const imgPreview = document.getElementById('imgPreview');
+        const dtInput = document.getElementById('dtInput');
+        const sBtn = document.getElementById('sBtn');
+        const statusEl = document.getElementById('statusEl');
+        const dlLink = document.getElementById('dlLink');
 
-        let originalImageDataURL = null;
-        let originalFileName = 'downloaded_image.jpg';
-        let originalFileType = 'image/jpeg';
+        let imgDataURL = null, originalFName = 'image.jpg', originalFType = 'image/jpeg';
 
-        // --- Helper to update status with style ---
-        function updateStatus(message, type = 'info') {
-            statusDisplay.textContent = message;
-            statusDisplay.className = type; // Assign class for styling (success, error, processing, warning, info)
-        }
+        const setStatus = (msg, type = 'info') => { statusEl.textContent = msg; statusEl.className = type; };
+        const checkEnableBtn = () => { sBtn.disabled = !(imgDataURL && dtInput.value); };
 
-        photoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            updateStatus(''); // Clear previous status
-            if (file) {
-                originalFileType = file.type;
-                if (!['image/jpeg', 'image/png', 'image/webp'].includes(originalFileType)) {
-                     updateStatus('தயவுசெய்து ஒரு JPEG, PNG, or WebP file-ஐ தேர்வுசெய்யவும்.', 'error');
-                     resetState();
-                     return;
-                 }
-                 if(originalFileType !== 'image/jpeg'){
-                     console.warn("EXIF support is best with JPEG files.");
-                     updateStatus('குறிப்பு: EXIF metadata JPEG file-களுக்கு சிறப்பாக செயல்படும்.', 'warning');
-                 }
+        const resetUI = (full = true) => {
+            fName.textContent = 'No file selected.';
+            imgPreview.style.display = 'none';
+            imgPreview.src = "#";
+            imgDataURL = null;
+            sBtn.disabled = true;
+            pInput.value = '';
+            dlLink.style.display = 'none';
+            dlLink.removeAttribute('href');
+            dlLink.removeAttribute('download');
+            if (full) { dtInput.value = ''; setStatus(''); }
+        };
 
-                originalFileName = file.name;
-                fileNameDisplay.textContent = `தேர்வு செய்யப்பட்டது: ${file.name}`;
-                downloadLink.style.display = 'none';
+        pInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            setStatus('');
+            if (!file) { resetUI(false); return; }
 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    originalImageDataURL = e.target.result;
-                    imagePreview.src = originalImageDataURL;
-                    imagePreview.style.display = 'block';
-                    checkEnableSaveButton();
-                }
-                reader.onerror = function() {
-                    updateStatus('Photo-வை படிக்க முடியவில்லை.', 'error');
-                    resetState();
-                }
-                reader.readAsDataURL(file);
-            } else {
-                resetState(false);
+            originalFType = file.type;
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(originalFType)) {
+                setStatus('Please select JPEG, PNG, or WebP file.', 'error'); resetUI(); return;
             }
+            if (originalFType !== 'image/jpeg') setStatus('Note: EXIF works best for JPEG.', 'warning');
+
+            originalFName = file.name;
+            fName.textContent = `Selected: ${originalFName}`;
+            dlLink.style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                imgDataURL = ev.target.result;
+                imgPreview.src = imgDataURL;
+                imgPreview.style.display = 'block';
+                checkEnableBtn();
+            };
+            reader.onerror = () => { setStatus('Cannot read file.', 'error'); resetUI(); };
+            reader.readAsDataURL(file);
         });
 
-        dateTimeInput.addEventListener('change', checkEnableSaveButton);
+        dtInput.addEventListener('change', checkEnableBtn);
 
-        function checkEnableSaveButton() {
-            saveButton.disabled = !(originalImageDataURL && dateTimeInput.value);
-        }
+        sBtn.addEventListener('click', () => {
+            if (!imgDataURL || !dtInput.value) { setStatus('Photo and Date/Time required.', 'error'); return; }
+            setStatus('Processing...', 'processing');
+            dlLink.style.display = 'none';
+            sBtn.disabled = true;
 
-        function resetState(fullReset = true) {
-            fileNameDisplay.textContent = 'எந்த photo-வும் தேர்வு செய்யப்படவில்லை.';
-            imagePreview.style.display = 'none';
-            imagePreview.src = "#";
-            originalImageDataURL = null;
-            saveButton.disabled = true;
-            photoInput.value = '';
-            downloadLink.style.display = 'none';
-            downloadLink.removeAttribute('href');
-            downloadLink.removeAttribute('download');
-             if (fullReset) {
-                dateTimeInput.value = '';
-                 updateStatus(''); // Clear status fully
-            }
-        }
-
-        saveButton.addEventListener('click', () => {
-            if (!originalImageDataURL || !dateTimeInput.value) {
-                updateStatus('Photo மற்றும் புதிய Date/Time இரண்டும் தேவை.', 'error');
-                return;
-            }
-
-            updateStatus('Processing... தயவுசெய்து காத்திருக்கவும்...', 'processing');
-            downloadLink.style.display = 'none';
-            saveButton.disabled = true;
-
-            processImageWithCanvas(originalImageDataURL, dateTimeInput.value)
+            processImage(imgDataURL, dtInput.value)
                 .then(({ finalDataUrl, finalFileName }) => {
-                    downloadLink.href = finalDataUrl;
-                    downloadLink.download = finalFileName;
-                    downloadLink.textContent = `மாற்றப்பட்ட Photo-வை Download செய்ய (${finalFileName})`;
-                    downloadLink.style.display = 'inline-block'; // Use inline-block for styling
-                    updateStatus('வெற்றிகரமாக மாற்றப்பட்டது! Download செய்ய தயாராக உள்ளது.', 'success');
+                    dlLink.href = finalDataUrl;
+                    dlLink.download = finalFileName;
+                    dlLink.textContent = `Download Modified (${finalFileName.substring(0,15)}...)`; // Shorter text
+                    dlLink.style.display = 'inline-block';
+                    setStatus('Success! Ready to download.', 'success');
                 })
-                .catch(error => {
-                    console.error("Error processing image:", error);
-                    updateStatus(`பிழை ஏற்பட்டது: ${error.message}`, 'error');
-                    downloadLink.style.display = 'none';
-                })
-                .finally(() => {
-                    checkEnableSaveButton();
-                });
+                .catch(err => { setStatus(`Error: ${err.message}`, 'error'); dlLink.style.display = 'none'; })
+                .finally(() => checkEnableBtn());
         });
 
-        function processImageWithCanvas(imageDataUrl, dateTimeString) {
+        function processImage(imageDataUrl, dateTimeString) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.onload = () => {
                     try {
                         const canvas = document.createElement('canvas');
-                        canvas.width = img.naturalWidth;
-                        canvas.height = img.naturalHeight;
+                        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0);
 
                         const newDate = new Date(dateTimeString);
-                        if (isNaN(newDate)) throw new Error("தேர்ந்தெடுக்கப்பட்ட Date/Time தவறானது.");
+                        if (isNaN(newDate)) throw new Error("Invalid Date/Time.");
 
-                        // Display format (more readable)
-                        const displayDateTime = newDate.toLocaleString('ta-IN', { // Tamil locale for format if desired
-                             year: 'numeric', month: '2-digit', day: '2-digit',
-                             hour: '2-digit', minute: '2-digit', hour12: false // Use 24hr format
-                        }).replace(',', ''); // Remove comma potentially added by localeString
+                        // Display format (Short)
+                        const dispDT = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}-${String(newDate.getDate()).padStart(2, '0')} ${String(newDate.getHours()).padStart(2, '0')}:${String(newDate.getMinutes()).padStart(2, '0')}`;
+                        const pad = Math.max(8, Math.min(canvas.width, canvas.height) * 0.015);
+                        const fSize = Math.max(10, Math.min(canvas.width, canvas.height) * 0.025);
 
-                        const padding = Math.max(10, Math.min(canvas.width, canvas.height) * 0.02);
-                        const fontSize = Math.max(14, Math.min(canvas.width, canvas.height) * 0.035); // Slightly larger base font
+                        ctx.font = `bold ${fSize}px sans-serif`; ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'; ctx.shadowBlur = fSize * 0.15;
+                        ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+                        ctx.fillText(dispDT, canvas.width - pad, canvas.height - pad);
 
-                        ctx.font = `bold ${fontSize}px Arial`; // Font for the overlay text
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; // Slightly transparent white
-                        ctx.textAlign = 'right';
-                        ctx.textBaseline = 'bottom';
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'; // Darker shadow
-                        ctx.shadowBlur = fontSize * 0.2; // Slightly larger blur
-                        ctx.shadowOffsetX = fontSize * 0.1;
-                        ctx.shadowOffsetY = fontSize * 0.1;
+                        const outMime = 'image/jpeg'; // Always output JPEG for EXIF
+                        const canvasDataUrl = canvas.toDataURL(outMime, 0.9);
 
-                        ctx.fillText(displayDateTime, canvas.width - padding, canvas.height - padding);
+                        // EXIF Data (Short)
+                        const y = newDate.getFullYear(), mo = String(newDate.getMonth()+1).padStart(2,'0'), d = String(newDate.getDate()).padStart(2,'0');
+                        const h = String(newDate.getHours()).padStart(2,'0'), m = String(newDate.getMinutes()).padStart(2,'0'), s = String(newDate.getSeconds()).padStart(2,'0');
+                        const exifDT = `${y}:${mo}:${d} ${h}:${m}:${s}`;
+                        const exifObj = {"0th": {[piexif.ImageIFD.DateTime]: exifDT}, "Exif": {[piexif.ExifIFD.DateTimeOriginal]: exifDT, [piexif.ExifIFD.DateTimeDigitized]: exifDT}, "GPS": {}};
+                        const exifBytes = piexif.dump(exifObj);
+                        const finalDataUrl = piexif.insert(exifBytes, canvasDataUrl);
 
-                        const outputMimeType = (originalFileType === 'image/jpeg') ? 'image/jpeg' : 'image/jpeg';
-                        const quality = (outputMimeType === 'image/jpeg') ? 0.92 : undefined; // Slightly higher JPEG quality
-                        const canvasDataUrl = canvas.toDataURL(outputMimeType, quality);
-
-                        // EXIF Data Preparation
-                        const exifYear = newDate.getFullYear();
-                        const exifMonth = String(newDate.getMonth() + 1).padStart(2, '0');
-                        const exifDay = String(newDate.getDate()).padStart(2, '0');
-                        const exifHours = String(newDate.getHours()).padStart(2, '0');
-                        const exifMinutes = String(newDate.getMinutes()).padStart(2, '0');
-                        const exifSeconds = String(newDate.getSeconds()).padStart(2, '0');
-                        const exifDateTime = `${exifYear}:${exifMonth}:${exifDay} ${exifHours}:${exifMinutes}:${exifSeconds}`;
-
-                        const zeroth = { [piexif.ImageIFD.DateTime]: exifDateTime };
-                        const exif = {
-                            [piexif.ExifIFD.DateTimeOriginal]: exifDateTime,
-                            [piexif.ExifIFD.DateTimeDigitized]: exifDateTime
-                        };
-                        const exifObj = {"0th": zeroth, "Exif": exif, "GPS": {}};
-                        const exifBytesStr = piexif.dump(exifObj);
-
-                        let finalDataUrl = canvasDataUrl;
-                        if (outputMimeType === 'image/jpeg') {
-                            finalDataUrl = piexif.insert(exifBytesStr, canvasDataUrl);
-                        } else {
-                             console.warn(`EXIF data not inserted for ${outputMimeType}.`);
-                             // Optional: Display a less prominent warning if EXIF wasn't added
-                             // updateStatus('குறிப்பு: EXIF metadata JPEG file-களுக்கு மட்டுமே சேர்க்கப்பட்டது.', 'warning');
-                        }
-
-                        const timestampSuffix = newDate.toISOString().replace(/[:\-T\.Z]/g, '').substring(0, 14);
-                        const baseName = originalFileName.substring(0, originalFileName.lastIndexOf('.')) || originalFileName;
-                        const extension = '.jpg'; // Always outputting JPEG from canvas for EXIF
-                        const finalFileName = `${baseName}_${timestampSuffix}${extension}`;
+                        const tsSuffix = newDate.toISOString().slice(0,19).replace(/[-T:]/g, ''); // YYYYMMDDHHMMSS
+                        const baseName = originalFName.substring(0, originalFName.lastIndexOf('.')) || originalFName;
+                        const finalFileName = `${baseName}_${tsSuffix}.jpg`; // Ensure .jpg extension
 
                         resolve({ finalDataUrl, finalFileName });
 
                     } catch (error) { reject(error); }
                 };
-                img.onerror = () => reject(new Error("Photo-வை Canvas-ல் load செய்ய முடியவில்லை."));
+                img.onerror = () => reject(new Error("Cannot load image on canvas."));
                 img.src = imageDataUrl;
             });
         }
-
-        // --- Initial Setup ---
-        resetState(true);
-
+        resetUI(); // Initial setup
     </script>
-
 </body>
 </html>
